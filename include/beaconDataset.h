@@ -1,5 +1,5 @@
-#ifndef NUPHASE_DATASET_H
-#define NUPHASE_DATASET_H
+#ifndef BEACON_DATASET_H
+#define BEACON_DATASET_H
 
 /** Class to simplify reading/writing of data */ 
 

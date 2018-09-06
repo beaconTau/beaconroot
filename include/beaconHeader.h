@@ -24,7 +24,7 @@ namespace beacon
       /** Default constructor */
       Header(); 
 
-#ifdef HAVE_LIBNUPHASE
+#ifdef HAVE_LIBBEACON
       /** Constructor from raw data (requires libeacon.so) */ 
       Header (const beacon_header *event); 
 #endif 

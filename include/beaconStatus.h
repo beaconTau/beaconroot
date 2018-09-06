@@ -4,7 +4,7 @@
 #include "TObject.h" 
 #include "beaconConsts.h" 
 
-#ifdef HAVE_LIBNUPHASE
+#ifdef HAVE_LIBBEACON
 struct beacon_status; 
 #endif
 
