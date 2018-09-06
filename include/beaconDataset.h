@@ -6,7 +6,7 @@
 
 class TTree; 
 
-namespace nuphase
+namespace beacon
 {
 
   class Hk; 

@@ -1,12 +1,12 @@
-#include "nuphaseHeader.h" 
+#include "beaconHeader.h" 
 
-ClassImp(nuphase::Header); 
+ClassImp(beacon::Header); 
 
-#ifdef HAVE_LIBNUPHASE
+#ifdef HAVE_LIBBEACON
 
-#include "nuphase.h" 
+#include "beacon.h" 
 
-nuphase::Header::Header(const nuphase_header *hd) 
+beacon::Header::Header(const beacon_header *hd) 
 {
       memcpy(&event_number,&hd->event_number,sizeof(event_number));
       memcpy(&trig_number,&hd->trig_number,sizeof(trig_number));
@@ -31,17 +31,16 @@ nuphase::Header::Header(const nuphase_header *hd)
       memcpy(&trigger_type,&hd->trig_type,sizeof(trigger_type)); 
       memcpy(&calpulser,&hd->calpulser,sizeof(calpulser)); 
       memcpy(&sync_problem,&hd->sync_problem,sizeof(sync_problem)); 
+      memcpy(&pps_counter,&hd->pps_counter,sizeof(pps_counter)); 
+      memcpy(&dynamic_beam_mask,&hd->pps_counter,sizeof(dynamic_beam_mask)); 
 
 
-      //this could be filled later 
-      corrected_trigger_time = 0; 
-      corrected_trigger_time_ns = 0; 
 
 }
 #endif
 
 
-nuphase::Header::Header()
+beacon::Header::Header()
 {
       memset(&trig_number,0,sizeof(trig_number));
       memset(&buffer_length,0,sizeof(buffer_length));
@@ -64,8 +63,8 @@ nuphase::Header::Header()
       memset(&trigger_type,0,sizeof(trigger_type)); 
       memset(&calpulser,0,sizeof(calpulser)); 
       memset(&sync_problem,0,sizeof(sync_problem)); 
+      memset(&pps_counter,0,sizeof(pps_counter)); 
+      memset(&dynamic_beam_mask,0,sizeof(dynamic_beam_mask)); 
 
-      corrected_trigger_time = 0; 
-      corrected_trigger_time_ns = 0; 
 }
 

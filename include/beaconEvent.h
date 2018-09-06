@@ -1,20 +1,20 @@
-#ifndef _NUPHASE_EVENT_H 
-#define _NUPHASE_EVENT_H 
+#ifndef _BEACON_EVENT_H 
+#define _BEACON_EVENT_H 
 
 
 #include "TObject.h" 
-#include "nuphaseConsts.h"
+#include "beaconConsts.h"
 #include <stdint.h> 
 #include <vector>
-#include "nuphaseCalibrationInfo.h" 
+#include "beaconCalibrationInfo.h" 
 
 class TGraph; 
 
-#ifdef HAVE_LIBNUPHASE
-struct nuphase_event; 
+#ifdef HAVE_LIBBEACON
+struct beacon_event; 
 #endif
 
-namespace nuphase
+namespace beacon
 {
 
   class Event : public TObject 
@@ -24,15 +24,15 @@ namespace nuphase
       /** Default constructor */
       Event(); 
 
-#ifdef HAVE_LIBNUPHASE
-      /** Constructor from raw data (requires libnuphase.so) */ 
-      Event (const nuphase_event *event); 
+#ifdef HAVE_LIBBEACON
+      /** Constructor from raw data (requires libbeacon.so) */ 
+      Event (const beacon_event *event); 
 #endif 
 
       /** Return the raw data for a board and channel. 
        * If there is no data for that channel, return NULL. 
        */ 
-      const UChar_t * getRawData(int channel, board b = BOARD_MASTER) const { return raw_data[b][channel].size() ?  &raw_data[b][channel][0]: 0 ; }
+      const UChar_t * getRawData(int channel) const { return raw_data[channel].size() ?  &raw_data[channel][0]: 0 ; }
 
       /** Sets the calibration for this event. This is used to convert from adc to Volts*/ 
       void setCalibrationInfo(const CalibrationInfo & info) { dumpCalibrated(); calibration = info; }  
@@ -45,17 +45,16 @@ namespace nuphase
        *
        **/ 
       TGraph * getGraph(int channel = 0, 
-                       board b = BOARD_MASTER, 
                        TGraph * useme = 0) const; 
 
       /** Retrieves calibrated data. 
        * This returns an internal copy that might get modified if setCalibrationInfo is called and will
        * be lost if this event is deallocated.. 
        **/ 
-      const double * getData(int channel = 0, board b = BOARD_MASTER) const; 
+      const double * getData(int channel = 0) const; 
 
       /** Returns a copy of calibrated data. Useful if you want to do something with it or w*/ 
-      double * copyData(int channel = 0, board b = BOARD_MASTER, double * dest = 0 ) const; 
+      double * copyData(int channel = 0, double * dest = 0 ) const; 
 
       uint16_t getBufferLength() const { return buffer_length; } 
 
@@ -66,14 +65,14 @@ namespace nuphase
       uint64_t event_number; 
       /** The buffer length */
       uint16_t buffer_length;
-      uint8_t board_id[k::num_boards]; 
-      std::vector<UChar_t> raw_data[k::num_boards][k::num_chans_per_board]; 
-      mutable std::vector<double> data[k::num_boards][k::num_chans_per_board];  //!  
+      uint8_t board_id; 
+      std::vector<UChar_t> raw_data[k::num_chans_per_board]; 
+      mutable std::vector<double> data[k::num_chans_per_board];  //!  
       void dumpCalibrated() const;   
       mutable uint64_t calibrated_event_number; //! 
       CalibrationInfo calibration; 
 
-    ClassDef(Event,2); 
+    ClassDef(Event,1); 
 
   }; 
 } 

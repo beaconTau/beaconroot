@@ -1,21 +1,21 @@
 cmake_minimum_required(VERSION 2.8.10)
 
-project(nuphaseroot)
-set(libname "nuphaseroot")
+project(beaconroot)
+set(libname "beaconroot")
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 
-if(DEFINED ENV{NUPHASE_INSTALL_DIR})
-    message("NUPHASE_INSTALL_DIR is set to $ENV{NUPHASE_INSTALL_DIR}")
-    set(UTIL_LIB_DIR $ENV{NUPHASE_INSTALL_DIR}/lib)
-    set(UTIL_INC_DIR $ENV{NUPHASE_INSTALL_DIR}/include)
-    set(UTIL_BIN_DIR $ENV{NUPHASE_INSTALL_DIR}/bin)
-    set(UTIL_SHARE_DIR $ENV{NUPHASE_INSTALL_DIR}/share)
-    set(LD_UTIL $ENV{NUPHASE_INSTALL_DIR}/lib)
-    set(INC_UTIL $ENV{NUPHASE_INSTALL_DIR}/include)
+if(DEFINED ENV{BEACON_INSTALL_DIR})
+    message("BEACON_INSTALL_DIR is set to $ENV{BEACON_INSTALL_DIR}")
+    set(UTIL_LIB_DIR $ENV{BEACON_INSTALL_DIR}/lib)
+    set(UTIL_INC_DIR $ENV{BEACON_INSTALL_DIR}/include)
+    set(UTIL_BIN_DIR $ENV{BEACON_INSTALL_DIR}/bin)
+    set(UTIL_SHARE_DIR $ENV{BEACON_INSTALL_DIR}/share)
+    set(LD_UTIL $ENV{BEACON_INSTALL_DIR}/lib)
+    set(INC_UTIL $ENV{BEACON_INSTALL_DIR}/include)
 else()
-    message("Will install to /usr/local  NUPHASE_INSTALL_DIR not set")
+    message("Will install to /usr/local  BEACON_INSTALL_DIR not set")
     set(UTIL_LIB_DIR /usr/local/lib)
     set(UTIL_INC_DIR /usr/local/include)
     set(UTIL_BIN_DIR /usr/local/bin)
@@ -85,22 +85,22 @@ endif()
 
 set(CMAKE_CXX_FLAGS_DEFAULT 
   "-Os -g -Wall" 
-  CACHE STRING "c++ Flags used during default eventReaderRoot builds" 
+  CACHE STRING "c++ Flags used during default builds" 
   FORCE ) 
 
 set(CMAKE_C_FLAGS_DEFAULT 
   "-Os -g -Wall"
-  CACHE STRING "c Flags used during default eventReaderRoot builds" 
+  CACHE STRING "c Flags used during default builds" 
   FORCE ) 
 
 set(CMAKE_EXE_LINKER_FLAGS_DEFAULT 
   "-g"
-  CACHE STRING "ld Flags used during default eventReaderRoot builds" 
+  CACHE STRING "ld Flags used during default builds" 
   FORCE ) 
 
 set(CMAKE_SHARED_LINKER_FLAGS_DEFAULT 
   "-g"
-  CACHE STRING "ld Flags used during default eventReaderRoot builds" 
+  CACHE STRING "ld Flags used during default builds" 
   FORCE ) 
 
 
@@ -115,35 +115,35 @@ endif()
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin )
 
 
-option (LIBNUPHASE_SUPPORT "Support for reading / converting from raw files." OFF) 
-set (LIBNUPHASE_PATH  "" CACHE String "Additional path  to search for libnuphase (only necessary if not in NUPHASE_INSTALL_DIR)" ) 
+option (LIBBEACON_SUPPORT "Support for reading / converting from raw files." OFF) 
+set (LIBBEACON_PATH  "" CACHE String "Additional path  to search for libbeacon (only necessary if not in BEACON_INSTALL_DIR)" ) 
 set (EXTRA_LIBS "") 
 
-if (LIBNUPHASE_SUPPORT) 
-  add_definitions( -DHAVE_LIBNUPHASE )
-  find_library(NUPHASE_LIB nuphase PATHS ${LIBNUPHASE_PATH})
+if (LIBBEACON_SUPPORT) 
+  add_definitions( -DHAVE_LIBBEACON )
+  find_library(BEACON_LIB beacon PATHS ${LIBBEACON_PATH})
   find_package(ZLIB REQUIRED)
-  if (LIBNUPHASE_PATH STREQUAL "") 
-    message ("Assuming libnuphase is in NUPHASE_INSTALL_DIR") 
+  if (LIBBEACON_PATH STREQUAL "") 
+    message ("Assuming libbeacon is in BEACON_INSTALL_DIR") 
   else()
-    include_directories(${LIBNUPHASE_PATH}) 
-    target_link_libraries(${libname} ${NUPHASE_LIB} ${ZLIB_LIBRARIES}) 
+    include_directories(${LIBBEACON_PATH}) 
+    target_link_libraries(${libname} ${BEACON_LIB} ${ZLIB_LIBRARIES}) 
   endif()
-endif(LIBNUPHASE_SUPPORT) 
+endif(LIBBEACON_SUPPORT) 
 
 
 set (BINSRCDIR programs) 
 macro(add_program binary_name ) 
   add_executable(${binary_name} ${BINSRCDIR}/${binary_name}.cc) 
   target_link_libraries(${binary_name}  ${ROOT_LIBRARIES} ${libname})
-  if (LIBNUPHASE_SUPPORT)
-    target_link_libraries(${binary_name}  ${ZLIB_LIBRARIES} nuphase)
+  if (LIBBEACON_SUPPORT)
+    target_link_libraries(${binary_name}  ${ZLIB_LIBRARIES} beacon)
   endif()
   INSTALL (PROGRAMS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${binary_name} DESTINATION ${UTIL_BIN_DIR})
 endmacro() 
 
-add_program(nuphaseroot-convert) 
-add_program(nuphaseroot-decimate) 
+add_program(beaconroot-convert) 
+add_program(beaconroot-decimate) 
 
 
 

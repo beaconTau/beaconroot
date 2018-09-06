@@ -1,11 +1,11 @@
 #! /usr/bin/env python 
 
-# Example for how to read nuphase data with python This mostly defines a
-# nuphase_data_reader class, but if you run it as a script it  will try to plot
-# some waveforms from run 360. Normally, you would do something like
+# Example for how to read beacon data with python This mostly defines a
+# beacon_data_reader class, but if you run it as a script it  will try to plot
+# some waveforms from run 99. Normally, you would do something like
 #    
-#   import nuphase_data_reader 
-#   d = nuphase_data_reader.Reader("/path/to/data",runno)  
+#   import beacon_data_reader 
+#   d = beacon_data_reader.Reader("/path/to/data",runno)  
 #   d.setEntry(someInterestingEntry) 
 #   d.wf(0) # get a numpy array of channel 0 
 
@@ -16,16 +16,16 @@ import numpy
 import sys
 
 
-## You need to load the libnuphaseroot library
+## You need to load the libbeaconroot library
 ## For the following line to work, the shared library must be in 
 ## your dynamic loader path (LD_LIBRARY_PATH or DYLD_LIBRARY_PATH, accordingly) 
 
-ROOT.gSystem.Load("libnuphaseroot.so"); 
+ROOT.gSystem.Load("libbeaconroot.so"); 
 
 
 ## A class to read in data from a run
 ##  
-##   e.g. d = nuphase_data_reader("/path/to/runs",runno) 
+##   e.g. d = beacon_data_reader("/path/to/runs",runno) 
 ##
 ##   To select the 100th entry in the run
 ##     d.setEntry(65079); 
@@ -54,20 +54,20 @@ class Reader:
 
     self.event_file = ROOT.TFile("%s/run%d/event.root" % (base_dir, run))
     self.event_tree = self.event_file.Get("event") 
-    self.evt = ROOT.nuphase.Event() 
+    self.evt = ROOT.beacon.Event() 
     self.event_entry = -1; 
     self.event_tree.SetBranchAddress("event",self.evt) 
 
     self.head_file = ROOT.TFile("%s/run%d/header.root" % (base_dir, run))
     self.head_tree = self.head_file.Get("header") 
-    self.head = ROOT.nuphase.Header(); 
+    self.head = ROOT.beacon.Header(); 
     self.head_entry = -1
     self.head_tree.SetBranchAddress("header",self.head) 
     self.head_tree.BuildIndex("header.event_number") 
 
     self.status_file = ROOT.TFile("%s/run%d/status.root" % (base_dir, run))
     self.status_tree = self.status_file.Get("status") 
-    self.stat= ROOT.nuphase.Status(); 
+    self.stat= ROOT.beacon.Status(); 
     self.status_tree.SetBranchAddress("status",self.stat) 
     self.status_tree.BuildIndex("status.readout_time","status.readout_time_ns"); 
     self.status_entry =-1; 
@@ -125,12 +125,12 @@ if __name__=="__main__":
   import matplotlib.pyplot as plt
 
 # If your data is elsewhere, pass it as an argument
-  datapath = sys.arvg[1] if len(sys.argv) > 1 else "/data/nuphase/root"
+  datapath = sys.arvg[1] if len(sys.argv) > 1 else "/data/beacon/root"
 
-# look at run 360
-  d = Reader(datapath,360) 
-# this is a SPIceCore event
-  d.setEntry(65079) 
+# look at run 99
+  d = Reader(datapath,99) 
+# this is a random event
+  d.setEntry(0) 
 
 ## dump the headers and status, just to show they're there
   d.header().Dump(); 
@@ -138,7 +138,7 @@ if __name__=="__main__":
   print d.N() 
 
 # plot all waveforms
-  for i in range(12): 
+  for i in range(8): 
     plt.subplot(3,4,i+1); 
     plt.plot(d.t(), d.wf(i))
   

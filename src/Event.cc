@@ -1,82 +1,75 @@
-#include "nuphaseEvent.h" 
+#include "beaconEvent.h" 
 
-ClassImp(nuphase::Event);
+ClassImp(beacon::Event);
 #include "TGraph.h" 
 #include "TAxis.h" 
 #include "TBuffer.h" 
 #include "TClass.h" 
 
 
-#ifdef HAVE_LIBNUPHASE
-#include "nuphase.h" 
+#ifdef HAVE_LIBBEACON
+#include "beacon.h" 
 
-nuphase::Event::Event(const nuphase_event * event) 
+beacon::Event::Event(const beacon_event * event) 
 {
   event_number = event->event_number; 
   buffer_length = event->buffer_length; 
-  memcpy(board_id,&event->board_id, sizeof(board_id)); 
+  board_id = event->board_id; 
 
 
-  for (int b = 0; b < k::num_boards; b++)
+
+  for (int c = 0; c < k::num_chans_per_board; c++)
   {
-    if (!board_id[b]) continue; 
-
-    for (int c = 0; c < k::num_chans_per_board; c++)
+    raw_data[c].resize(buffer_length); 
+    for (int i = 0; i < buffer_length; i++)
     {
-      raw_data[b][c].resize(buffer_length); 
-      for (int i = 0; i < buffer_length; i++)
-      {
-        raw_data[b][c][i] = event->data[b][c][i]; 
-      }
+      raw_data[c][i] = event->data[c][i]; 
     }
   }
 }
 #endif
 
-nuphase::Event::Event() 
+beacon::Event::Event() 
 {
   event_number = 0;
   buffer_length = 0; 
   calibrated_event_number = 0; 
-  memset(board_id,0,sizeof(board_id)); 
+  board_id = 0; 
 }
 
-void nuphase::Event::dumpCalibrated() const
+void beacon::Event::dumpCalibrated() const
 {
-  for (int b = 0; b < k::num_boards; b++)
+  for (int c = 0; c < k::num_chans_per_board; c++)
   {
-    for (int c = 0; c < k::num_chans_per_board; c++)
-    {
-      data[b][c].clear(); 
-    }
+    data[c].clear(); 
   }
 }
 
-const double * nuphase::Event::getData(int c, board b) const 
+const double * beacon::Event::getData(int c) const 
 {
 
   if (event_number!= calibrated_event_number) dumpCalibrated(); 
 
   //This is the calibration part 
-  if (!data[b][c].size() && raw_data[b][c].size())
+  if (!data[c].size() && raw_data[c].size())
   {
     calibrated_event_number = event_number; 
-    data[b][c].resize(buffer_length); 
+    data[c].resize(buffer_length); 
     for (int i = 0; i < buffer_length; i++) 
     {
-      data[b][c][i] = raw_data[b][c][i] * calibration.getVoltageCalibration(b,c); 
+      data[c][i] = raw_data[c][i] * calibration.getVoltageCalibration(c); 
     }
   }
 
-  return data[b][c].size() ? &data[b][c][0] : 0; 
+  return data[c].size() ? &data[c][0] : 0; 
 }
 
 
-double * nuphase::Event::copyData(int c, board b, double * destination) const
+double * beacon::Event::copyData(int c, double * destination) const
 {
   if (!destination) destination = new double[buffer_length]; 
 
-  const double * the_data = getData(c,b); 
+  const double * the_data = getData(c); 
   if (!the_data)
   {
     memset(destination,0,buffer_length*sizeof(double)); 
@@ -89,17 +82,17 @@ double * nuphase::Event::copyData(int c, board b, double * destination) const
   return destination; 
 }
 
-TGraph * nuphase::Event::getGraph(int channel, board b, TGraph * g) const
+TGraph * beacon::Event::getGraph(int channel, TGraph * g) const
 {
   if (!g) g = new TGraph(buffer_length); 
   else g->Set(buffer_length); 
 
-  copyData(channel,b, g->GetY()); 
+  copyData(channel, g->GetY()); 
 
 
   for (int i = 0; i < g->GetN(); i++) 
   {
-    double offset = calibration.getLenDelayConst() * calibration.getCableLen(b, channel); 
+    double offset = calibration.getCableDelay(channel); 
     g->GetX()[i] = i * calibration.getTimeCalibration() - offset;
   }
 
@@ -107,7 +100,7 @@ TGraph * nuphase::Event::getGraph(int channel, board b, TGraph * g) const
   g->GetXaxis()->SetTitle(getUnitString(calibration.getTimeUnits())); 
 
   TString title;
-  title.Form("Board %s, Channel %d\n", nuphase::getBoardString(b),channel); 
+  title.Form("Channel %d\n",channel); 
   g->SetTitle(title.Data()); 
   return g; 
 

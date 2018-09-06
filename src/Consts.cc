@@ -1,7 +1,7 @@
-#include "nuphaseConsts.h" 
+#include "beaconConsts.h" 
 
 
-const char * nuphase::getUnitString(nuphase::units u)
+const char * beacon::getUnitString(beacon::units u)
 {
   switch (u) 
   {
@@ -18,16 +18,3 @@ const char * nuphase::getUnitString(nuphase::units u)
   }
 }
 
-const char * nuphase::getBoardString(nuphase::board b) 
-{
-
-  switch(b)
-  {
-    case BOARD_MASTER : 
-      return "MASTER"; 
-    case BOARD_SLAVE : 
-      return "SLAVE"; 
-    default: 
-      return "???"; 
-  }
-}

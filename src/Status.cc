@@ -1,12 +1,12 @@
-#include "nuphaseStatus.h" 
+#include "beaconStatus.h" 
 
 
-ClassImp(nuphase::Status); 
+ClassImp(beacon::Status); 
 
-#ifdef HAVE_LIBNUPHASE
-#include "nuphase.h" 
+#ifdef HAVE_LIBBEACON
+#include "beacon.h" 
 
-nuphase::Status::Status(const nuphase_status * s) 
+beacon::Status::Status(const beacon_status * s) 
 {
 
   memcpy(global_scalers, s->global_scalers, sizeof(global_scalers)); 
@@ -17,11 +17,12 @@ nuphase::Status::Status(const nuphase_status * s)
   readout_time_ns = s->readout_time_ns; 
   latched_pps_time = s->latched_pps_time; 
   board_id = s->board_id; 
+  dynamic_beam_mask = s->dynamic_beam_mask; 
 }
 
 #endif
 
-nuphase::Status::Status() 
+beacon::Status::Status() 
 {
 
   memset(global_scalers,0, sizeof(global_scalers)); 
@@ -32,6 +33,7 @@ nuphase::Status::Status()
   readout_time_ns = 0;
   latched_pps_time = 0;
   board_id = 0;
+  dynamic_beam_mask = 0; 
 }
 
 

@@ -4,10 +4,10 @@
 
 #include "TTree.h" 
 #include "TFile.h" 
-#include "nuphaseEvent.h" 
-#include "nuphaseHeader.h" 
-#include "nuphaseStatus.h" 
-#include "nuphaseHk.h" 
+#include "beaconEvent.h" 
+#include "beaconHeader.h" 
+#include "beaconStatus.h" 
+#include "beaconHk.h" 
 
 
 int main(int nargs, char ** args) 
@@ -16,7 +16,7 @@ int main(int nargs, char ** args)
 
   if (nargs < 4 || (strcmp(what,"hk") && strcmp(what,"status") && strcmp(what,"header") && strcmp(what,"event")))
   {
-    fprintf(stderr, "Usage: nuphaseroot-decimate what=[hk status header event] decimate_factor input_files\n"); 
+    fprintf(stderr, "Usage: beaconroot-decimate what=[hk status header event] decimate_factor input_files\n"); 
     return -1; 
   }
 

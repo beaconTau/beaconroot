@@ -1,18 +1,18 @@
 #include <stdio.h> 
-#include "nuphaseConverter.h" 
-#include "nuphaseEvent.h" 
-#include "nuphaseHeader.h" 
-#include "nuphaseStatus.h" 
-#include "nuphaseHk.h" 
+#include "beaconConverter.h" 
+#include "beaconEvent.h" 
+#include "beaconHeader.h" 
+#include "beaconStatus.h" 
+#include "beaconHk.h" 
 #include "TTree.h" 
 #include "TFile.h" 
 
 static bool allow_overwrite = false; 
-void nuphase::convert::setAllowOverwrite(bool allow) { allow_overwrite = allow; } 
+void beacon::convert::setAllowOverwrite(bool allow) { allow_overwrite = allow; } 
 
 
-#ifdef HAVE_LIBNUPHASE
-#include "nuphase.h" 
+#ifdef HAVE_LIBBEACON
+#include "beacon.h" 
 
 #include <vector> 
 #include <zlib.h>
@@ -88,49 +88,49 @@ static int convertDir(const char * dir, const char * outfile, const char * treen
 }
 
 
-int nuphase::convert::convertHkFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertHkFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
-  return convert_impl<Hk, nuphase_hk, nuphase_hk_gzread>(nfiles, infiles, outfile,"hk"); 
+  return convert_impl<Hk, beacon_hk, beacon_hk_gzread>(nfiles, infiles, outfile,"hk"); 
 }
 
-int nuphase::convert::convertHeaderFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertHeaderFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
-  return convert_impl<Header, nuphase_header,nuphase_header_gzread> (nfiles, infiles, outfile,"header"); 
+  return convert_impl<Header, beacon_header,beacon_header_gzread> (nfiles, infiles, outfile,"header"); 
 }
 
-int nuphase::convert::convertEventFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertEventFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
-  return convert_impl<Event, nuphase_event,nuphase_event_gzread> (nfiles, infiles, outfile,"event"); 
+  return convert_impl<Event, beacon_event,beacon_event_gzread> (nfiles, infiles, outfile,"event"); 
 }
 
-int nuphase::convert::convertStatusFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertStatusFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
-  return convert_impl<Status, nuphase_status,nuphase_status_gzread> (nfiles, infiles, outfile,"status"); 
-}
-
-
-int nuphase::convert::convertHkDir(const char * dir, const char * outfile) 
-{
-  return convertDir<Hk, nuphase_hk,nuphase_hk_gzread> (dir, outfile,"hk"); 
-}
-
-int nuphase::convert::convertHeaderDir(const char * dir, const char * outfile) 
-{
-  return convertDir<Header, nuphase_header,nuphase_header_gzread> (dir, outfile,"header"); 
-}
-
-int nuphase::convert::convertEventDir(const char * dir, const char * outfile) 
-{
-  return convertDir<Event, nuphase_event,nuphase_event_gzread> (dir, outfile,"event"); 
-}
-
-int nuphase::convert::convertStatusDir(const char * dir, const char * outfile) 
-{
-  return convertDir<Status, nuphase_status,nuphase_status_gzread> (dir, outfile,"status"); 
+  return convert_impl<Status, beacon_status,beacon_status_gzread> (nfiles, infiles, outfile,"status"); 
 }
 
 
-int nuphase::convert::convertRun(const char * base_raw, const char * base_root, int run) 
+int beacon::convert::convertHkDir(const char * dir, const char * outfile) 
+{
+  return convertDir<Hk, beacon_hk,beacon_hk_gzread> (dir, outfile,"hk"); 
+}
+
+int beacon::convert::convertHeaderDir(const char * dir, const char * outfile) 
+{
+  return convertDir<Header, beacon_header,beacon_header_gzread> (dir, outfile,"header"); 
+}
+
+int beacon::convert::convertEventDir(const char * dir, const char * outfile) 
+{
+  return convertDir<Event, beacon_event,beacon_event_gzread> (dir, outfile,"event"); 
+}
+
+int beacon::convert::convertStatusDir(const char * dir, const char * outfile) 
+{
+  return convertDir<Status, beacon_status,beacon_status_gzread> (dir, outfile,"status"); 
+}
+
+
+int beacon::convert::convertRun(const char * base_raw, const char * base_root, int run) 
 {
 
   TString outf; 
@@ -165,84 +165,84 @@ int nuphase::convert::convertRun(const char * base_raw, const char * base_root, 
 
 #else
 
-int nuphase::convert::convertHkFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertHkFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
   (void) nfiles; 
   (void) infiles; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
-int nuphase::convert::convertHeaderFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertHeaderFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
 
   (void) nfiles; 
   (void) infiles; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
-int nuphase::convert::convertEventFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertEventFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
   (void) nfiles; 
   (void) infiles; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
-int nuphase::convert::convertStatusFiles(int nfiles, const char ** infiles, const char * outfile) 
+int beacon::convert::convertStatusFiles(int nfiles, const char ** infiles, const char * outfile) 
 {
   (void) nfiles; 
   (void) infiles; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
 
-int nuphase::convert::convertHkDir(const char * dir, const char * outfile) 
+int beacon::convert::convertHkDir(const char * dir, const char * outfile) 
 {
   (void) dir; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
-int nuphase::convert::convertHeaderDir(const char * dir, const char * outfile) 
+int beacon::convert::convertHeaderDir(const char * dir, const char * outfile) 
 {
 
   (void) dir; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
-int nuphase::convert::convertEventDir(const char * dir, const char * outfile) 
+int beacon::convert::convertEventDir(const char * dir, const char * outfile) 
 {
   (void) dir; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
-int nuphase::convert::convertStatusDir(const char * dir, const char * outfile) 
+int beacon::convert::convertStatusDir(const char * dir, const char * outfile) 
 {
   (void) dir; 
   (void) outfile; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 }
 
 
-int nuphase::convert::convertRun(const char * base_raw, const char * base_root, int run) 
+int beacon::convert::convertRun(const char * base_raw, const char * base_root, int run) 
 {
   (void) base_raw; 
   (void) base_root; 
   (void) run; 
-  fprintf(stderr,"%s requires HAVE_LIBNUPHASE\n",__func__); 
+  fprintf(stderr,"%s requires HAVE_LIBBEACON\n",__func__); 
   return -1; 
 
 } 
@@ -250,7 +250,7 @@ int nuphase::convert::convertRun(const char * base_raw, const char * base_root, 
 
 #endif
 
-int nuphase::convert::makeFilteredHeadTree(const char * filtered_event_file, const char * full_head_file, const char * filtered_head_file) 
+int beacon::convert::makeFilteredHeadTree(const char * filtered_event_file, const char * full_head_file, const char * filtered_head_file) 
 {
 
   TFile fef(filtered_event_file); 
@@ -287,83 +287,4 @@ int nuphase::convert::makeFilteredHeadTree(const char * filtered_event_file, con
   return 0; 
 }
 
-// convert trig_time to true time, using status file
-
-int nuphase::convert::correctHeaderFileTime(const char * infileHeader, const char * infileStatus, const char * outfile)
-{
-
-  TFile fHeader(infileHeader);
-  TTree * headTree  = (TTree*) fHeader.Get("header") ; 
-  TFile fStatus(infileStatus);
-  TTree * statusTree = (TTree*) fStatus.Get("status"); 
-
-  if (!statusTree || !headTree) return 1; 
-  headTree->BuildIndex("event_number"); 
-
-  TFile of(outfile, allow_overwrite ? "RECREATE":"CREATE"); 
-  TTree *correctedTree = new TTree("header","time corrected header files"); 
-
-  Header * hd = 0; 
-  Status * sts = 0; 
-
-  headTree->SetBranchAddress("header",&hd); 
-  statusTree->SetBranchAddress("status",&sts); 
-  correctedTree->Branch("header",&hd); 
-
-  // Line of readout_time vs. latched_pps_time results in the 
-  // function needed to do the trig_time to real time conversion
-  // slope fM has units [s / tdc]
-  // intercept fB has units [s]
-
-  double fM = 0.0;
-  double fB = 0.0;
-
-  double x_avg = 0;
-  double y_avg = 0;
-  uint64_t sentries = statusTree->GetEntriesFast();  
-  for(size_t jentry = 0; jentry < sentries; jentry++) {
-    statusTree->GetEntry(jentry);
-    x_avg += double(sts->latched_pps_time);
-    y_avg += double(sts->readout_time);
-  }
-  x_avg /= double(sentries);
-  y_avg /= double(sentries);
-
-  double sum_num = 0;
-  double sum_den = 0;
-  for(size_t jentry = 0; jentry < sentries; jentry++) {
-    statusTree->GetEntry(jentry);
-    sum_num += (double(sts->latched_pps_time) - x_avg)*(double(sts->readout_time) - y_avg);
-    sum_den += (double(sts->latched_pps_time) - x_avg)*(double(sts->latched_pps_time) - x_avg);
-  }
-
-  fM = double(sum_num) / double(sum_den);
-  fB = double(y_avg) - fM * double (x_avg);
-
-  // With line correction done, now loop over events and convert trig time to real time
-
-  // Have to unwrap this due to a bug of 48 bit Trig time being saved into a 32 bit number
-  headTree->GetEntry(0);
-  uint32_t prev_trig_time = hd->trig_time[0];
-  uint32_t num_trig_wraps = 0;
-
-  for (int i = 0; i < headTree->GetEntries(); i++) {    
-    headTree->GetEntry(i);
-
-    if(hd->trig_time[0] < prev_trig_time) { num_trig_wraps += 1; }
-    prev_trig_time = hd->trig_time[0];
-
-    uint64_t unwrapped_trig = uint64_t(hd->trig_time[0]) | (uint64_t(num_trig_wraps) << 32);          
-
-    double corrected_time = unwrapped_trig * fM + fB;
-    hd->corrected_trigger_time = int(corrected_time);
-    hd->corrected_trigger_time_ns = int((corrected_time - int(corrected_time)) * 1e9);
-
-    of.cd(); 
-    correctedTree->Fill(); 
-  }
-
-
-  of.Write(); 
-  return 0; 
-}
+//

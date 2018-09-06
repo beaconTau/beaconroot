@@ -1,11 +1,11 @@
-#ifndef NUPHASE_CONVERTER_H
-#define NUPHASE_CONVERTER_H
+#ifndef BEACON_CONVERTER_H
+#define BEACON_CONVERTER_H
 
 /** This file implements converters from raw  files to a ROOT tree
- * Obviously, it requires libnuphsae
+ * Obviously, it requires libbeacon
  */
 
-namespace nuphase
+namespace beacon
 {
 
   namespace convert
@@ -34,9 +34,6 @@ namespace nuphase
 
   /** Convert a single Header file into a ROOT file */ 
   inline int convertHeaderFile(const char * infile, const char * outfile) {return  convertHeaderFiles(1,&infile,outfile); } 
-
-  /** Correct Trig_time in a single Header ROOT file */
-  int correctHeaderFileTime(const char * infileHeader, const char * infileStatus, const char * outfile);
 
   /** Convert a set of Status files to a ROOT tree */ 
   int convertStatusFiles(int nfiles, const char ** infiles, const char * outfile); 

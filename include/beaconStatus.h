@@ -1,15 +1,15 @@
-#ifndef _NUPHASE_STATUS_H 
-#define _NUPHASE_STATUS_H 
+#ifndef _BEACON_STATUS_H 
+#define _BEACON_STATUS_H 
 
 #include "TObject.h" 
-#include "nuphaseConsts.h" 
+#include "beaconConsts.h" 
 
 #ifdef HAVE_LIBNUPHASE
-struct nuphase_status; 
+struct beacon_status; 
 #endif
 
 
-namespace nuphase
+namespace beacon
 {
   class Status : public TObject
   {
@@ -17,9 +17,9 @@ namespace nuphase
       /** Default constructor */ 
       Status(); 
 
-#ifdef HAVE_LIBNUPHASE
-        /** Constructor from raw data (requires libnuphase.so) */ 
-      Status (const nuphase_status *status); 
+#ifdef HAVE_LIBBEACON
+        /** Constructor from raw data (requires libbeacon.so) */ 
+      Status (const beacon_status *status); 
 #endif 
 
       uint16_t global_scalers[k::num_scalers];  //!< The overall scalers 
@@ -30,6 +30,7 @@ namespace nuphase
       uint32_t trigger_thresholds[k::num_beams]; //!< Trigger thresholds 
       uint64_t latched_pps_time; //!< timestamp corresponding to a pps time
       uint8_t  board_id; //!< the board number assigned at startup 
+      uint32_t dynamic_beam_mask; 
 
       ClassDef(Status,1); 
   };
