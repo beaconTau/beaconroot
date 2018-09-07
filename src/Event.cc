@@ -14,7 +14,7 @@ beacon::Event::Event(const beacon_event * event)
 {
   event_number = event->event_number; 
   buffer_length = event->buffer_length; 
-  board_id = event->board_id; 
+  board_id = event->board_id[0]; 
 
 
 
@@ -23,7 +23,7 @@ beacon::Event::Event(const beacon_event * event)
     raw_data[c].resize(buffer_length); 
     for (int i = 0; i < buffer_length; i++)
     {
-      raw_data[c][i] = event->data[c][i]; 
+      raw_data[c][i] = event->data[0][c][i]; 
     }
   }
 }

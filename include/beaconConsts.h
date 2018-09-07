@@ -6,7 +6,7 @@ namespace beacon
   namespace k
   {
     const int num_chans_per_board = 8; 
-    const int num_beams = 8; 
+    const int num_beams = 20; 
     const int num_scalers = 3; 
   }
 
