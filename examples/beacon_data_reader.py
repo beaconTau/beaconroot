@@ -2,7 +2,7 @@
 
 # Example for how to read beacon data with python This mostly defines a
 # beacon_data_reader class, but if you run it as a script it  will try to plot
-# some waveforms from run 99. Normally, you would do something like
+# some waveforms from run 141. Normally, you would do something like
 #    
 #   import beacon_data_reader 
 #   d = beacon_data_reader.Reader("/path/to/data",runno)  
@@ -40,10 +40,10 @@ ROOT.gSystem.Load("libbeaconroot.so");
 ##   For now, you can look at the c++ doc to see what is in each
 ##  
 ##  You can also numpy arrays of the waveform values and time using 
+## 
 ##  d.wf(channel)  
-##  Channels 0-7 are on the master board, channels 8-11 are on the slave. 
 ##   
-##  For convenience, d.t() makes a time array with the right number of samples (the sample rate is always 1.5 GSPS) 
+##  For convenience, d.t() makes a time array with the right number of samples (the sample rate is always 0.5 GSPS) 
 
 class Reader:
 
@@ -98,7 +98,7 @@ class Reader:
     g = None #try to forget 
 
   def t(self):
-    return numpy.linspace(0, self.event().getBufferLength() /1.5, self.event().getBufferLength()) 
+    return numpy.linspace(0, self.event().getBufferLength() 0.5, self.event().getBufferLength()) 
 
   def header(self,force_reload = False): 
     if (self.head_entry != self.current_entry or force_reload): 
@@ -127,10 +127,10 @@ if __name__=="__main__":
 # If your data is elsewhere, pass it as an argument
   datapath = sys.arvg[1] if len(sys.argv) > 1 else "/data/beacon/root"
 
-# look at run 99
-  d = Reader(datapath,99) 
+# look at run 141
+  d = Reader(datapath,141) 
 # this is a random event
-  d.setEntry(0) 
+  d.setEntry(53) 
 
 ## dump the headers and status, just to show they're there
   d.header().Dump(); 
@@ -139,7 +139,7 @@ if __name__=="__main__":
 
 # plot all waveforms
   for i in range(8): 
-    plt.subplot(3,4,i+1); 
+    plt.subplot(2,4,i+1); 
     plt.plot(d.t(), d.wf(i))
   
   plt.show() 
