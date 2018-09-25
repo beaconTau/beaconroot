@@ -93,7 +93,7 @@ class Reader:
 
   def wf(self,ch = 0):  
     ## stupid hack because for some reason it doesn't always report the right buffer length 
-    g = self.event().getGraph(ch % 8, ch/8) 
+    g = self.event().getGraph(ch % 8) 
     return numpy.frombuffer(g.GetY(), numpy.dtype('float64'), self.event().getBufferLength()) - 64 
     g = None #try to forget 
 
