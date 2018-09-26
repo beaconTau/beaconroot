@@ -98,7 +98,7 @@ class Reader:
     g = None #try to forget 
 
   def t(self):
-    return numpy.linspace(0, self.event().getBufferLength()*0.5, self.event().getBufferLength()) 
+    return numpy.linspace(0, self.event().getBufferLength()*2, self.event().getBufferLength()) 
 
   def header(self,force_reload = False): 
     if (self.head_entry != self.current_entry or force_reload): 
