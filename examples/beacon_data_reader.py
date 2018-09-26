@@ -108,7 +108,7 @@ class Reader:
 
   def status(self,force_reload = False): 
     if (self.status_entry != self.current_entry or force_reload): 
-      self.status_tree.GetEntry(self.status_tree.GetEntryNumberWithBestIndex(self.header().readout_time[0], self.header().readout_time_ns[0]))
+      self.status_tree.GetEntry(self.status_tree.GetEntryNumberWithBestIndex(self.header().readout_time, self.header().readout_time_ns))
       self.status_entry = self.current_entry
 
     return self.stat
