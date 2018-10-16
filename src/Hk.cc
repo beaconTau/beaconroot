@@ -19,11 +19,11 @@ beacon::Hk::Hk(const beacon_hk * hk)
     disk_space_kB=hk->disk_space_kB; 
     free_mem_kB=hk->free_mem_kB;  
 
-    inv_batt_V = hk->inv_batt_dV/10; 
-    cc_batt_V = hk->cc_batt_dV/10; 
-    pv_V = hk->pv_dV/10; 
+    inv_batt_V = hk->inv_batt_dV/10.; 
+    cc_batt_V = hk->cc_batt_dV/10.; 
+    pv_V = hk->pv_dV/10.; 
     cc_daily_Ah = hk->cc_daily_Ah; 
-    cc_daily_kWh = hk->cc_daily_hWh/10; 
+    cc_daily_kWh = hk->cc_daily_hWh/10.; 
 }
 #endif
 
