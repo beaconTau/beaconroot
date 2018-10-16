@@ -35,7 +35,14 @@ namespace beacon
     uint32_t disk_space_kB; 
     uint32_t free_mem_kB;  
 
-    ClassDef(Hk,1); 
+    //just to confuse people, I'll use double32_t's here 
+    Double32_t inv_batt_V; //[0,102.4,10]
+    Double32_t cc_batt_V; //[0,102.4,10]
+    Double32_t pv_V; //[0,819.2,13]
+    uint8_t cc_daily_Ah;  
+    Double32_t cc_daily_kWh; //[0,25.6,8]; 
+
+    ClassDef(Hk,2); 
   }; 
 }
 
