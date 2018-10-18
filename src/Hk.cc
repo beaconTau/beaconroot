@@ -14,6 +14,7 @@ beacon::Hk::Hk(const beacon_hk * hk)
     temp_adc=hk->temp_adc; 
     frontend_current=hk->frontend_current; 
     aux_current=hk->aux_current; 
+    adc_current=hk->adc_current; 
     ant_current=hk->ant_current; 
     gpio_state= (gpio_power_state) hk->gpio_state; 
     disk_space_kB=hk->disk_space_kB; 
