@@ -2,7 +2,7 @@
 
 # Example for how to read beacon data with python This mostly defines a
 # beacon_data_reader class, but if you run it as a script it  will try to plot
-# some waveforms from run 141. Normally, you would do something like
+# some waveforms from run 362. Normally, you would do something like
 #    
 #   import beacon_data_reader 
 #   d = beacon_data_reader.Reader("/path/to/data",runno)  
@@ -54,21 +54,21 @@ class Reader:
 
     self.event_file = ROOT.TFile("%s/run%d/event.root" % (base_dir, run))
     self.event_tree = self.event_file.Get("event") 
-    self.evt = ROOT.beacon.Event() 
+#    self.evt = ROOT.beacon.Event() 
     self.event_entry = -1; 
-    self.event_tree.SetBranchAddress("event",self.evt) 
+#    self.event_tree.SetBranchAddress("event",ROOT.addressof(self.evt))
 
     self.head_file = ROOT.TFile("%s/run%d/header.root" % (base_dir, run))
     self.head_tree = self.head_file.Get("header") 
-    self.head = ROOT.beacon.Header(); 
+#    self.head = ROOT.beacon.Header(); 
     self.head_entry = -1
-    self.head_tree.SetBranchAddress("header",self.head) 
+#    self.head_tree.SetBranchAddress("header",ROOT.addressof(self.head))
     self.head_tree.BuildIndex("header.event_number") 
 
     self.status_file = ROOT.TFile("%s/run%d/status.root" % (base_dir, run))
     self.status_tree = self.status_file.Get("status") 
-    self.stat= ROOT.beacon.Status(); 
-    self.status_tree.SetBranchAddress("status",self.stat) 
+#    self.stat= ROOT.beacon.Status(); 
+#    self.status_tree.SetBranchAddress("status",self.stat) 
     self.status_tree.BuildIndex("status.readout_time","status.readout_time_ns"); 
     self.status_entry =-1; 
 
@@ -88,6 +88,7 @@ class Reader:
     if (self.event_entry != self.current_entry or force_reload):
       self.event_tree.GetEntry(self.current_entry)
       self.event_entry = self.current_entry 
+      self.evt = getattr(self.event_tree,"event")
     return self.evt 
 
 
@@ -104,12 +105,14 @@ class Reader:
     if (self.head_entry != self.current_entry or force_reload): 
       self.head_tree.GetEntry(self.current_entry); 
       self.head_entry = self.current_entry 
+      self.head = getattr(self.head_tree,"header")
     return self.head 
 
   def status(self,force_reload = False): 
     if (self.status_entry != self.current_entry or force_reload): 
       self.status_tree.GetEntry(self.status_tree.GetEntryNumberWithBestIndex(self.header().readout_time, self.header().readout_time_ns))
       self.status_entry = self.current_entry
+      self.stat = getattr(self.status_tree,"status")
 
     return self.stat
 
@@ -125,10 +128,10 @@ if __name__=="__main__":
   import matplotlib.pyplot as plt
 
 # If your data is elsewhere, pass it as an argument
-  datapath = sys.arvg[1] if len(sys.argv) > 1 else "/data/beacon/root"
+  datapath = sys.argv[1] if len(sys.argv) > 1 else "/data/beacon/root"
 
-# look at run 141
-  d = Reader(datapath,141) 
+# look at run 362
+  d = Reader(datapath,362) 
 # this is a random event
   d.setEntry(53) 
 
