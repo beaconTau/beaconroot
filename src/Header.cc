@@ -25,6 +25,7 @@ beacon::Header::Header(const beacon_header *hd)
       memcpy(&channel_mask,&hd->channel_mask,sizeof(channel_mask));
       memcpy(&channel_read_mask,&hd->channel_read_mask,sizeof(channel_read_mask));
       memcpy(&gate_flag,&hd->gate_flag,sizeof(gate_flag));
+      memcpy(&trigger_pol,&hd->trig_pol,sizeof(trigger_pol));
 
       memcpy(&buffer_mask,&hd->buffer_mask,sizeof(buffer_mask));
       memcpy(&board_id,&hd->board_id,sizeof(board_id)); 
@@ -65,6 +66,7 @@ beacon::Header::Header()
       memset(&sync_problem,0,sizeof(sync_problem)); 
       memset(&pps_counter,0,sizeof(pps_counter)); 
       memset(&dynamic_beam_mask,0,sizeof(dynamic_beam_mask)); 
+      memset(&trigger_pol,0, sizeof(trigger_pol)); 
 
 }
 
