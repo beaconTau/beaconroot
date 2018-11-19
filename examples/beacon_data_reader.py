@@ -135,7 +135,7 @@ if __name__=="__main__":
 ## dump the headers and status, just to show they're there
   d.header().Dump(); 
   d.status().Dump(); 
-  print d.N() 
+  #print d.N() 
 
 # plot all waveforms
   for i in range(8): 
