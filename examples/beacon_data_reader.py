@@ -73,7 +73,6 @@ class Reader:
     self.status_entry =-1; 
 
     self.current_entry = 0; 
-    self.agraph = ROOT.TGraph()
     
   def setEntry(self,i): 
     if (i < 0 or i >= self.head_tree.GetEntries()):
@@ -95,10 +94,9 @@ class Reader:
 
   def wf(self,ch = 0):  
     ## stupid hack because for some reason it doesn't always report the right buffer length 
-    self.event().getGraph(ch % 8,self.agraph) 
-    buf = self.agraph.GetY() 
-    v = numpy.copy(numpy.frombuffer(buf, numpy.dtype('float64'), self.event().getBufferLength()))
-    v -=numpy.mean(v) 
+    ev = self.event() 
+    v = numpy.copy(numpy.frombuffer(ev.getData(ch), numpy.dtype('float64'), ev.getBufferLength()))
+    v -=64
     return v;
 
   def t(self):
