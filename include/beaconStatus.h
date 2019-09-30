@@ -31,8 +31,9 @@ namespace beacon
       uint64_t latched_pps_time; //!< timestamp corresponding to a pps time
       uint8_t  board_id; //!< the board number assigned at startup 
       uint32_t dynamic_beam_mask; 
+      uint8_t veto_status; 
 
-      ClassDef(Status,1); 
+      ClassDef(Status,2); 
   };
 }
 

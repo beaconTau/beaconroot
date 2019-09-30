@@ -18,6 +18,7 @@ beacon::Status::Status(const beacon_status * s)
   latched_pps_time = s->latched_pps_time; 
   board_id = s->board_id; 
   dynamic_beam_mask = s->dynamic_beam_mask; 
+  veto_status = s->veto_status; 
 }
 
 #endif
@@ -34,6 +35,7 @@ beacon::Status::Status()
   latched_pps_time = 0;
   board_id = 0;
   dynamic_beam_mask = 0; 
+  veto_status = 0; 
 }
 
 

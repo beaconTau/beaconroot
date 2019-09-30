@@ -64,9 +64,10 @@ namespace beacon
       uint8_t sync_problem;                          //!< Various sync problems. TODO convert to enum 
       uint32_t pps_counter; 
       uint32_t dynamic_beam_mask; 
+      uint32_t veto_deadtime_counter; 
 
 
-    ClassDef(Header,1); 
+    ClassDef(Header,2); 
   }; 
 } 
 

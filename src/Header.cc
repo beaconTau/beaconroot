@@ -33,7 +33,8 @@ beacon::Header::Header(const beacon_header *hd)
       memcpy(&calpulser,&hd->calpulser,sizeof(calpulser)); 
       memcpy(&sync_problem,&hd->sync_problem,sizeof(sync_problem)); 
       memcpy(&pps_counter,&hd->pps_counter,sizeof(pps_counter)); 
-      memcpy(&dynamic_beam_mask,&hd->pps_counter,sizeof(dynamic_beam_mask)); 
+      memcpy(&dynamic_beam_mask,&hd->dynamic_beam_mask,sizeof(dynamic_beam_mask)); 
+      memcpy(&veto_deadtime_counter,&hd->veto_deadtime_counter,sizeof(veto_deadtime_counter)); 
 
 
 
@@ -67,6 +68,7 @@ beacon::Header::Header()
       memset(&pps_counter,0,sizeof(pps_counter)); 
       memset(&dynamic_beam_mask,0,sizeof(dynamic_beam_mask)); 
       memset(&trigger_pol,0, sizeof(trigger_pol)); 
+      memset(&veto_deadtime_counter,0, sizeof(veto_deadtime_counter)); 
 
 }
 
