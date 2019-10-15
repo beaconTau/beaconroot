@@ -52,20 +52,20 @@ class Reader:
     self.run = run; 
     self.base_dir = base_dir
 
-    self.event_file = ROOT.TFile("%s/run%d/event.root" % (base_dir, run))
+    self.event_file = ROOT.TFile.Open("%s/run%d/event.root" % (base_dir, run))
     self.event_tree = self.event_file.Get("event") 
 #    self.evt = ROOT.beacon.Event() 
     self.event_entry = -1; 
 #    self.event_tree.SetBranchAddress("event",ROOT.addressof(self.evt))
 
-    self.head_file = ROOT.TFile("%s/run%d/header.root" % (base_dir, run))
+    self.head_file = ROOT.TFile.Open("%s/run%d/header.root" % (base_dir, run))
     self.head_tree = self.head_file.Get("header") 
 #    self.head = ROOT.beacon.Header(); 
     self.head_entry = -1
 #    self.head_tree.SetBranchAddress("header",ROOT.addressof(self.head))
     self.head_tree.BuildIndex("header.event_number") 
 
-    self.status_file = ROOT.TFile("%s/run%d/status.root" % (base_dir, run))
+    self.status_file = ROOT.TFile.Open("%s/run%d/status.root" % (base_dir, run))
     self.status_tree = self.status_file.Get("status") 
 #    self.stat= ROOT.beacon.Status(); 
 #    self.status_tree.SetBranchAddress("status",self.stat) 
@@ -96,8 +96,7 @@ class Reader:
     ## stupid hack because for some reason it doesn't always report the right buffer length 
     ev = self.event() 
     v = numpy.copy(numpy.frombuffer(ev.getData(ch), numpy.dtype('float64'), ev.getBufferLength()))
-    v -=64
-    return v;
+    return v
 
   def t(self):
     return numpy.linspace(0, self.event().getBufferLength()*2, self.event().getBufferLength()) 
@@ -131,10 +130,10 @@ if __name__=="__main__":
 # If your data is elsewhere, pass it as an argument
   datapath = sys.argv[1] if len(sys.argv) > 1 else "/data/beacon/root"
 
-# look at run 362
-  d = Reader(datapath,362) 
-# this is a random event
-  d.setEntry(53) 
+# look at run 362 by default, or else pass a run
+  d = Reader(datapath,int(sys.argv[2]) if len(sys.argv) > 2 else 362) 
+# look at a random event by default, or else pass an event
+  d.setEntry(int(sys.argv[3]) if len(sys.argv) > 3 else 53) 
 
 ## dump the headers and status, just to show they're there
   d.header().Dump(); 
