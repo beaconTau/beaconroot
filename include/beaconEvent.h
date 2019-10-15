@@ -37,6 +37,7 @@ namespace beacon
       /** Sets the calibration for this event. This is used to convert from adc to Volts*/ 
       void setCalibrationInfo(const CalibrationInfo & info) { dumpCalibrated(); calibration = info; }  
 
+      int getRunNumber() const { return (int) (event_number / 1000000000l); } 
 
       /** This creates a calibrated, properly named,  TGraph of this event 
        *
@@ -70,7 +71,7 @@ namespace beacon
       mutable std::vector<double> data[k::num_chans_per_board];  //!  
       void dumpCalibrated() const;   
       mutable uint64_t calibrated_event_number; //! 
-      CalibrationInfo calibration; 
+      mutable CalibrationInfo calibration; 
 
     ClassDef(Event,1); 
 
