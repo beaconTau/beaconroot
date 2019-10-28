@@ -71,9 +71,9 @@ namespace beacon
       mutable std::vector<double> data[k::num_chans_per_board];  //!  
       void dumpCalibrated() const;   
       mutable uint64_t calibrated_event_number; //! 
-      mutable CalibrationInfo calibration; 
+      mutable CalibrationInfo calibration;//!
 
-    ClassDef(Event,1); 
+    ClassDef(Event,2); 
 
   }; 
 } 
