@@ -50,6 +50,11 @@ const double * beacon::Event::getData(int c) const
 
   if (event_number!= calibrated_event_number) dumpCalibrated(); 
 
+  if (calibration.getRunNumber() != getRunNumber()) 
+  {
+    calibration = CalibrationInfo(getRunNumber()); 
+  }
+
   //This is the calibration part 
   if (!data[c].size() && raw_data[c].size())
   {
@@ -57,7 +62,7 @@ const double * beacon::Event::getData(int c) const
     data[c].resize(buffer_length); 
     for (int i = 0; i < buffer_length; i++) 
     {
-      data[c][i] = raw_data[c][i] * calibration.getVoltageCalibration(c); 
+      data[c][i] = (raw_data[c][i] - calibration.getBaseline()) * calibration.getVoltageCalibration(c); 
     }
   }
 
