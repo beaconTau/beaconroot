@@ -28,7 +28,9 @@ static int convert_impl(int nfiles, const char ** infiles, const char * outfile,
   int nprocessed = 0; 
 
   TFile of(outfile, allow_overwrite ? "RECREATE" : "CREATE"); 
+  of.SetCompressionSettings(105); 
   TTree * tree = new TTree(treename,treename); 
+  tree->SetAutoSave(0); 
   RootType * ptr = new RootType; 
   RawType raw; 
   tree->Branch(treename,&ptr); 
@@ -67,6 +69,7 @@ static int convertDir(const char * dir, const char * outfile, const char * treen
   while ((dent = readdir(dirp)))
   {
     TString str; 
+    if (dent->d_name[0] == '.') continue; 
     str.Form("%s/%s",dir,dent->d_name);
     files.push_back(std::string(str.Data())); //since I know std::sort works for strings 
   }
