@@ -1,4 +1,4 @@
-#! /usr/bin/env python 
+#! /usr/bin/env python3 
 
 # Example for how to read beacon data with python This mostly defines a
 # beacon_data_reader class, but if you run it as a script it  will try to plot
@@ -46,7 +46,16 @@ ROOT.gSystem.Load("libbeaconroot.so");
 ##  For convenience, d.t() makes a time array with the right number of samples (the sample rate is always 0.5 GSPS) 
 
 class Reader:
-
+  '''
+  This is the python reader wrapper that allows for pulling the event data for BEACON.
+  
+  Parameters
+  ----------
+  base_dir : str
+      The directory in which you have BEACON data files stored.
+  run : int
+      The run number for which you want to access data.
+  '''
   def __init__(self,base_dir, run):
 
     self.run = run; 
@@ -74,17 +83,43 @@ class Reader:
 
     self.current_entry = 0; 
     
+    self.t = numpy.linspace(0, (self.event().getBufferLength() - 1)*2, self.event().getBufferLength()) #Should have spacing of 2 ns
+    
   def setEntry(self,i): 
+    '''
+    Sets the current entry to i.  Other functions such as self.wf and self.status will then pull information for the set event.
+    
+    Parameters
+    ----------
+    i : int
+        The enetry/eventid to set the state of the reader.
+    '''
     if (i < 0 or i >= self.head_tree.GetEntries()):
       sys.stderr.write("Entry out of bounds!") 
     else: 
       self.current_entry = i; 
 
   def setEvent(self,i):
+    '''
+    Sets the current entry in the root tree to i.  Other functions such as self.wf and self.status will then pull information for the set event.
+    
+    Parameters
+    ----------
+    i : int
+        The enetry/eventid to set the state of the reader.
+    '''
     setEntry(self.head_tree.GetEntryNumberWithIndex(i)) 
 
 
-  def event(self,force_reload = False): 
+  def event(self,force_reload = False):
+    '''
+    Does the required preparations for the event to be loaded.  By default this does nothing if the event is already properly set.
+    
+    Parameters
+    ----------
+    force_reload : bool
+        Will force this to reset entry info.
+    '''
     if (self.event_entry != self.current_entry or force_reload):
       self.event_tree.GetEntry(self.current_entry)
       self.event_entry = self.current_entry 
@@ -93,15 +128,46 @@ class Reader:
 
 
   def wf(self,ch = 0):  
+    '''
+    This will pull the waveform data (returned in adu) for the requested channel.  The channel mapping for the
+    2019 prototype is: 
+    0: NE, Hpol
+    1: NE, Vpol
+    2: NW, Hpol
+    3: NW, Vpol
+    4: SE, Hpol
+    5: SE, Vpol
+    6: SW, Hpol
+    7: SW, Vpol
+    
+    This is subject to change so always cross reference the run with with those in the know to be sure.
+    
+    Parameters
+    ----------
+    ch : int
+      The channel you specifically want to read out a signal for.
+    '''
     ## stupid hack because for some reason it doesn't always report the right buffer length 
     ev = self.event() 
     v = numpy.copy(numpy.frombuffer(ev.getData(ch), numpy.dtype('float64'), ev.getBufferLength()))
     return v
 
   def t(self):
-    return numpy.linspace(0, self.event().getBufferLength()*2, self.event().getBufferLength()) 
+    '''
+    This will return the timing info for a typical run.  This is predefined to assuming 2ns timing between samples, and is
+    calculated rather than measured. 
+    '''
+    return self.t
 
   def header(self,force_reload = False): 
+    '''
+    This will print out the header info from the root tree.
+    
+    Parameters
+    ----------
+    force_reload : bool
+      If True, this will ensure the event information is properly set before running the function.
+    '''
     if (self.head_entry != self.current_entry or force_reload): 
       self.head_tree.GetEntry(self.current_entry); 
       self.head_entry = self.current_entry 
@@ -109,6 +175,14 @@ class Reader:
     return self.head 
 
   def status(self,force_reload = False): 
+    '''
+    This will print out the status info from the root tree.
+    
+    Parameters
+    ----------
+    force_reload : bool
+      If True, this will ensure the event information is properly set before running the function.
+    '''
     if (self.status_entry != self.current_entry or force_reload): 
       self.status_tree.GetEntry(self.status_tree.GetEntryNumberWithBestIndex(self.header().readout_time, self.header().readout_time_ns))
       self.status_entry = self.current_entry
@@ -117,7 +191,10 @@ class Reader:
     return self.stat
 
 
-  def N(self): 
+  def N(self):
+    '''
+    This will return the number of entries (eventids) in a given run.
+    '''
     return self.head_tree.GetEntries() 
 
 
@@ -128,12 +205,13 @@ if __name__=="__main__":
   import matplotlib.pyplot as plt
 
 # If your data is elsewhere, pass it as an argument
-  datapath = sys.argv[1] if len(sys.argv) > 1 else "/data/beacon/root"
+  datapath = sys.argv[1] if len(sys.argv) > 1 else '/project2/avieregg/beacon/telem/root/'
+  #datapath = sys.argv[1] if len(sys.argv) > 1 else "/data/beacon/root"
 
 # look at run 362 by default, or else pass a run
-  d = Reader(datapath,int(sys.argv[2]) if len(sys.argv) > 2 else 362) 
+  d = Reader(datapath,int(sys.argv[2]) if len(sys.argv) > 2 else 1507)#362) #1507 is pulsing run for the 2019-2020 prototype. 
 # look at a random event by default, or else pass an event
-  d.setEntry(int(sys.argv[3]) if len(sys.argv) > 3 else 53) 
+  d.setEntry(int(sys.argv[3]) if len(sys.argv) > 3 else 18453)#53) #Event from pulsing 
 
 ## dump the headers and status, just to show they're there
   d.header().Dump(); 
