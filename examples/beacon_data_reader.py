@@ -83,7 +83,7 @@ class Reader:
 
     self.current_entry = 0; 
     
-    self.t = numpy.linspace(0, (self.event().getBufferLength() - 1)*2, self.event().getBufferLength()) #Should have spacing of 2 ns
+    self.times_ns = numpy.linspace(0, (self.event().getBufferLength() - 1)*2, self.event().getBufferLength()) #Should have spacing of 2 ns
     
   def setEntry(self,i): 
     '''
@@ -157,7 +157,7 @@ class Reader:
     This will return the timing info for a typical run.  This is predefined to assuming 2ns timing between samples, and is
     calculated rather than measured. 
     '''
-    return self.t
+    return self.times_ns
 
   def header(self,force_reload = False): 
     '''
