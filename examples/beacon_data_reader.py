@@ -196,7 +196,19 @@ class Reader:
     This will return the number of entries (eventids) in a given run.
     '''
     return self.head_tree.GetEntries() 
+  
+  def global_scalers(self):
+    ''' 
+    Returns the global scalers for a given entry in the status tree
+    '''
+    # uses a workaround to access the array from cppyy.ll
+    return numpy.frombuffer(cppyy.ll.cast['uint16_t*'](stat.global_scalers), dtype=numpy.uint16, count=3)
 
+  def beam_scalers(self):
+    ''' 
+    Returns the beam scalers for a given entry in the status tree
+    '''
+    return numpy.frombuffer(cppyy.ll.cast['uint16_t*'](self.stat.beam_scalers), dtype=numpy.uint16, count=60).reshape(3,20)
 
 # Plot some waveforms is run as a binary 
 if __name__=="__main__": 
