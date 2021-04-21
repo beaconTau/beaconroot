@@ -14,6 +14,7 @@
 import ROOT
 import numpy 
 import sys
+import cppyy
 
 
 ## You need to load the libbeaconroot library
