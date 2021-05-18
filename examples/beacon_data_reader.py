@@ -14,8 +14,9 @@
 import ROOT
 import numpy 
 import sys
+import os
+import inspect
 import cppyy
-
 
 ## You need to load the libbeaconroot library
 ## For the following line to work, the shared library must be in 
@@ -58,34 +59,42 @@ class Reader:
       The run number for which you want to access data.
   '''
   def __init__(self,base_dir, run):
+    try:
+      self.failed_setup = False
+      self.run = run; 
+      self.base_dir = base_dir
 
-    self.run = run; 
-    self.base_dir = base_dir
+      self.event_file = ROOT.TFile.Open("%s/run%d/event.root" % (base_dir, run))
+      self.event_tree = self.event_file.Get("event") 
+  #    self.evt = ROOT.beacon.Event() 
+      self.event_entry = -1; 
+  #    self.event_tree.SetBranchAddress("event",ROOT.addressof(self.evt))
 
-    self.event_file = ROOT.TFile.Open("%s/run%d/event.root" % (base_dir, run))
-    self.event_tree = self.event_file.Get("event") 
-#    self.evt = ROOT.beacon.Event() 
-    self.event_entry = -1; 
-#    self.event_tree.SetBranchAddress("event",ROOT.addressof(self.evt))
+      self.head_file = ROOT.TFile.Open("%s/run%d/header.root" % (base_dir, run))
+      self.head_tree = self.head_file.Get("header") 
+  #    self.head = ROOT.beacon.Header(); 
+      self.head_entry = -1
+  #    self.head_tree.SetBranchAddress("header",ROOT.addressof(self.head))
+      self.head_tree.BuildIndex("header.event_number") 
 
-    self.head_file = ROOT.TFile.Open("%s/run%d/header.root" % (base_dir, run))
-    self.head_tree = self.head_file.Get("header") 
-#    self.head = ROOT.beacon.Header(); 
-    self.head_entry = -1
-#    self.head_tree.SetBranchAddress("header",ROOT.addressof(self.head))
-    self.head_tree.BuildIndex("header.event_number") 
+      self.status_file = ROOT.TFile.Open("%s/run%d/status.root" % (base_dir, run))
+      self.status_tree = self.status_file.Get("status") 
+  #    self.stat= ROOT.beacon.Status(); 
+  #    self.status_tree.SetBranchAddress("status",self.stat) 
+      self.status_tree.BuildIndex("status.readout_time","status.readout_time_ns"); 
+      self.status_entry =-1; 
 
-    self.status_file = ROOT.TFile.Open("%s/run%d/status.root" % (base_dir, run))
-    self.status_tree = self.status_file.Get("status") 
-#    self.stat= ROOT.beacon.Status(); 
-#    self.status_tree.SetBranchAddress("status",self.stat) 
-    self.status_tree.BuildIndex("status.readout_time","status.readout_time_ns"); 
-    self.status_entry =-1; 
+      self.current_entry = 0; 
+      
+      self.times_ns = numpy.linspace(0, (self.event().getBufferLength() - 1)*2, self.event().getBufferLength()) #Should have spacing of 2 ns
+    except Exception as e:
+      self.failed_setup = True
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
-    self.current_entry = 0; 
-    
-    self.times_ns = numpy.linspace(0, (self.event().getBufferLength() - 1)*2, self.event().getBufferLength()) #Should have spacing of 2 ns
-    
   def setEntry(self,i): 
     '''
     Sets the current entry to i.  Other functions such as self.wf and self.status will then pull information for the set event.
@@ -95,10 +104,17 @@ class Reader:
     i : int
         The enetry/eventid to set the state of the reader.
     '''
-    if (i < 0 or i >= self.head_tree.GetEntries()):
-      sys.stderr.write("Entry out of bounds!") 
-    else: 
-      self.current_entry = i; 
+    try:
+      if (i < 0 or i >= self.head_tree.GetEntries()):
+        sys.stderr.write("Entry out of bounds!") 
+      else: 
+        self.current_entry = i; 
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
   def setEvent(self,i):
     '''
@@ -109,7 +125,14 @@ class Reader:
     i : int
         The enetry/eventid to set the state of the reader.
     '''
-    setEntry(self.head_tree.GetEntryNumberWithIndex(i)) 
+    try:
+      setEntry(self.head_tree.GetEntryNumberWithIndex(i)) 
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
 
   def event(self,force_reload = False):
@@ -121,11 +144,18 @@ class Reader:
     force_reload : bool
         Will force this to reset entry info.
     '''
-    if (self.event_entry != self.current_entry or force_reload):
-      self.event_tree.GetEntry(self.current_entry)
-      self.event_entry = self.current_entry 
-      self.evt = getattr(self.event_tree,"event")
-    return self.evt 
+    try:
+      if (self.event_entry != self.current_entry or force_reload):
+        self.event_tree.GetEntry(self.current_entry)
+        self.event_entry = self.current_entry 
+        self.evt = getattr(self.event_tree,"event")
+      return self.evt 
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
 
   def wf(self,ch = 0):  
@@ -149,16 +179,30 @@ class Reader:
       The channel you specifically want to read out a signal for.
     '''
     ## stupid hack because for some reason it doesn't always report the right buffer length 
-    ev = self.event() 
-    v = numpy.copy(numpy.frombuffer(ev.getData(ch), numpy.dtype('float64'), ev.getBufferLength()))
-    return v
+    try:
+      ev = self.event() 
+      v = numpy.copy(numpy.frombuffer(ev.getData(ch), numpy.dtype('float64'), ev.getBufferLength()))
+      return v
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
   def t(self):
     '''
     This will return the timing info for a typical run.  This is predefined to assuming 2ns timing between samples, and is
     calculated rather than measured. 
     '''
-    return self.times_ns
+    try:
+      return self.times_ns
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
   def header(self,force_reload = False): 
     '''
@@ -169,11 +213,18 @@ class Reader:
     force_reload : bool
       If True, this will ensure the event information is properly set before running the function.
     '''
-    if (self.head_entry != self.current_entry or force_reload): 
-      self.head_tree.GetEntry(self.current_entry); 
-      self.head_entry = self.current_entry 
-      self.head = getattr(self.head_tree,"header")
-    return self.head 
+    try:
+      if (self.head_entry != self.current_entry or force_reload): 
+        self.head_tree.GetEntry(self.current_entry); 
+        self.head_entry = self.current_entry 
+        self.head = getattr(self.head_tree,"header")
+      return self.head 
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
   def status(self,force_reload = False): 
     '''
@@ -184,32 +235,60 @@ class Reader:
     force_reload : bool
       If True, this will ensure the event information is properly set before running the function.
     '''
-    if (self.status_entry != self.current_entry or force_reload): 
-      self.status_tree.GetEntry(self.status_tree.GetEntryNumberWithBestIndex(self.header().readout_time, self.header().readout_time_ns))
-      self.status_entry = self.current_entry
-      self.stat = getattr(self.status_tree,"status")
+    try:
+      if (self.status_entry != self.current_entry or force_reload): 
+        self.status_tree.GetEntry(self.status_tree.GetEntryNumberWithBestIndex(self.header().readout_time, self.header().readout_time_ns))
+        self.status_entry = self.current_entry
+        self.stat = getattr(self.status_tree,"status")
 
-    return self.stat
+      return self.stat
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
 
   def N(self):
     '''
     This will return the number of entries (eventids) in a given run.
     '''
-    return self.head_tree.GetEntries() 
+    try:
+      return self.head_tree.GetEntries() 
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
   
   def global_scalers(self):
     ''' 
     Returns the global scalers for a given entry in the status tree
     '''
     # uses a workaround to access the array from cppyy.ll
-    return numpy.frombuffer(cppyy.ll.cast['uint16_t*'](stat.global_scalers), dtype=numpy.uint16, count=3)
+    try:
+      return numpy.frombuffer(cppyy.ll.cast['uint16_t*'](stat.global_scalers), dtype=numpy.uint16, count=3)
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
   def beam_scalers(self):
     ''' 
     Returns the beam scalers for a given entry in the status tree
     '''
-    return numpy.frombuffer(cppyy.ll.cast['uint16_t*'](self.stat.beam_scalers), dtype=numpy.uint16, count=60).reshape(3,20)
+    try:
+      return numpy.frombuffer(cppyy.ll.cast['uint16_t*'](self.stat.beam_scalers), dtype=numpy.uint16, count=60).reshape(3,20)
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
 
 # Plot some waveforms is run as a binary 
 if __name__=="__main__": 
@@ -237,16 +316,3 @@ if __name__=="__main__":
     plt.plot(d.t(), d.wf(i))
   
   plt.show() 
-
-
-
-
-  
-
-
-
-
-
-
-
-
