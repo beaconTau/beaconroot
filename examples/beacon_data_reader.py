@@ -64,23 +64,23 @@ class Reader:
       self.run = run; 
       self.base_dir = base_dir
 
-      self.event_file = ROOT.TFile.Open("%s/run%d/event.root" % (base_dir, run))
+      self.event_file = ROOT.TFile.Open(os.path.join(self.base_dir, "run%d/event.root"%run))
       self.event_tree = self.event_file.Get("event") 
-  #    self.evt = ROOT.beacon.Event() 
+      # self.evt = ROOT.beacon.Event() 
       self.event_entry = -1; 
-  #    self.event_tree.SetBranchAddress("event",ROOT.addressof(self.evt))
+      # self.event_tree.SetBranchAddress("event",ROOT.addressof(self.evt))
 
-      self.head_file = ROOT.TFile.Open("%s/run%d/header.root" % (base_dir, run))
+      self.head_file = ROOT.TFile.Open(os.path.join(self.base_dir, "run%d/header.root"%run))
       self.head_tree = self.head_file.Get("header") 
-  #    self.head = ROOT.beacon.Header(); 
+      # self.head = ROOT.beacon.Header(); 
       self.head_entry = -1
-  #    self.head_tree.SetBranchAddress("header",ROOT.addressof(self.head))
+      # self.head_tree.SetBranchAddress("header",ROOT.addressof(self.head))
       self.head_tree.BuildIndex("header.event_number") 
 
-      self.status_file = ROOT.TFile.Open("%s/run%d/status.root" % (base_dir, run))
+      self.status_file = ROOT.TFile.Open(os.path.join(self.base_dir, "run%d/status.root"%run))
       self.status_tree = self.status_file.Get("status") 
-  #    self.stat= ROOT.beacon.Status(); 
-  #    self.status_tree.SetBranchAddress("status",self.stat) 
+      # self.stat= ROOT.beacon.Status(); 
+      # self.status_tree.SetBranchAddress("status",self.stat) 
       self.status_tree.BuildIndex("status.readout_time","status.readout_time_ns"); 
       self.status_entry =-1; 
 
