@@ -17,6 +17,7 @@ import sys
 import os
 import inspect
 import cppyy
+import matplotlib.pyplot as plt
 
 ## You need to load the libbeaconroot library
 ## For the following line to work, the shared library must be in 
@@ -289,6 +290,151 @@ class Reader:
       exc_type, exc_obj, exc_tb = sys.exc_info()
       fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
       print(exc_type, fname, exc_tb.tb_lineno)
+
+
+  def returnTriggerThresholds(self, expected_max_beam=19, plot=False):
+    '''
+    Given a reader object this will extract the trigger thresholds for each beam.
+
+    If expected_max_beam = None then this will attempt to access beams until the reader returns an error.
+    '''
+    try:
+      failed = False
+      beam_index = 0
+      while failed == False:
+        try:
+          N =self.status_tree.Draw("trigger_thresholds[%i]:Entry$"%beam_index,"","goff")
+
+          if beam_index == 0:
+            thresholds = numpy.frombuffer(self.status_tree.GetV1(), numpy.dtype('float64'), N)
+            eventids = numpy.frombuffer(self.status_tree.GetV2(), numpy.dtype('float64'), N).astype(int)
+          else:
+            thresholds = numpy.vstack((thresholds,numpy.frombuffer(self.status_tree.GetV1(), numpy.dtype('float64'), N)))
+          if beam_index is not None:
+            if beam_index == expected_max_beam:
+              failed=True
+          beam_index += 1
+        except:
+          failed = True
+
+      if plot:
+        plt.figure()
+        plt.title('Trigger Thresholds')
+        for beam_index, t in enumerate(thresholds):
+          plt.plot(eventids, t, label='Beam %i'%beam_index)
+        plt.xlabel('EntryId / eventid')
+        plt.ylabel('Power Sum (arb)')
+
+      return thresholds
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
+
+  def returnBeamScalers(self, expected_max_beam=19, plot=False):
+    '''
+    Given a reader object this will extract the beam scalers for each beam as they are presented on monutau.
+
+    If expected_max_beam = None then this will attempt to access beams until the reader returns an error.
+    '''
+    try:
+      failed = False
+      beam_index = 0
+      while failed == False:
+        try:
+          N = self.status_tree.Draw("beam_scalers[0][%i]/10.:Entry$"%beam_index,"","goff")
+
+          if beam_index == 0:
+            beam_scalers = numpy.frombuffer(self.status_tree.GetV1(), numpy.dtype('float64'), N)
+            eventids = numpy.frombuffer(self.status_tree.GetV2(), numpy.dtype('float64'), N).astype(int)
+          else:
+            beam_scalers = numpy.vstack((beam_scalers,numpy.frombuffer(self.status_tree.GetV1(), numpy.dtype('float64'), N)))
+          if beam_index is not None:
+            if beam_index == expected_max_beam:
+              failed=True
+          beam_index += 1
+        except:
+          failed = True
+
+      if plot:
+        plt.figure()
+        plt.title('Beam Scalers')
+        for beam_index, t in enumerate(beam_scalers):
+          plt.plot(eventids, t, label='Beam %i'%beam_index)
+        plt.xlabel('EntryId / eventid')
+        plt.ylabel('Hz')
+
+      return beam_scalers
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
+
+
+  def returnGlobalScalers(self, plot=False):
+    '''
+    This will return global scalers global_scalers[0], global_scalers[1]/10, global_scalers[2]/10 as they are
+    read in and presented on monutau.
+    '''
+    try:
+      N = self.status_tree.Draw("global_scalers[0]:global_scalers[1]/10.:global_scalers[2]/10.:trigger_thresholds[%i]:Entry$"%beam_index,"","goff")
+
+      global_scalers_0 = numpy.frombuffer(self.status_tree.GetV1(), numpy.dtype('float64'), N)
+      global_scalers_1 = numpy.frombuffer(self.status_tree.GetV2(), numpy.dtype('float64'), N) 
+      global_scalers_2 = numpy.frombuffer(self.status_tree.GetV3(), numpy.dtype('float64'), N)
+      eventids = numpy.frombuffer(self.status_tree.GetV4(), numpy.dtype('float64'), N).astype(int)
+
+      if plot:
+        plt.figure()
+        plt.plot(eventids, global_scalers_0, label = 'Fast') # Labels taken from Monutau.
+        plt.plot(eventids, global_scalers_0, label = 'Slow Gated') # Labels taken from Monutau.
+        plt.plot(eventids, global_scalers_0, label = 'Slow') # Labels taken from Monutau.
+        plt.ylabel('Hz')
+        plt.xlabel('EntryId / eventid')
+        plt.legend()
+
+      return global_scalers_0, global_scalers_1, global_scalers_2, eventids
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
+
+  def returnTriggerInfo(self):
+    '''
+    This will return global scalers global_scalers[0], global_scalers[1]/10, global_scalers[2]/10 as they are
+    read in and presented on monutau.
+    '''
+    try:
+      N = self.head_tree.Draw("triggered_beams:beam_power:Entry$","","goff")
+
+      # The below attempts return nan or inf.  Unsure why. Using a workaround loop below.  
+      # triggered_beams = numpy.log2(numpy.frombuffer(self.status_tree.GetV1(), numpy.dtype('float64'), N).astype(int))
+      # beam_power = numpy.frombuffer(self.status_tree.GetV2(), numpy.dtype('float64'), N).astype(int)
+      eventids = numpy.frombuffer(self.status_tree.GetV3(), numpy.dtype('float64'), N).astype(int)
+
+      triggered_beams = numpy.zeros(self.N())
+      beam_power = numpy.zeros(self.N())
+      for eventid in range(self.N()):
+        self.setEntry(eventid)
+        triggered_beams[eventid] = int(self.header().triggered_beams)
+        beam_power[eventid] = int(self.header().beam_power)
+
+      return numpy.log2(triggered_beams).astype(int), beam_power.astype(int), eventids
+    except Exception as e:
+      print('\nError in %s'%inspect.stack()[0][3])
+      print(e)
+      exc_type, exc_obj, exc_tb = sys.exc_info()
+      fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+      print(exc_type, fname, exc_tb.tb_lineno)
+
+
+
 
 # Plot some waveforms is run as a binary 
 if __name__=="__main__": 
